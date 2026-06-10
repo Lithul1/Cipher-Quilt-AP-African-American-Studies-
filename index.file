@@ -1,1 +1,831 @@
 
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+#cq-shell{
+  background:#1a1208;
+  border:2px solid #6b4f1a;
+  border-radius:16px;
+  padding:20px;
+  max-width:640px;
+  margin:8px auto;
+  min-height:480px;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+}
+
+#cq-shell::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:14px;
+  background:repeating-linear-gradient(45deg,rgba(255,255,255,0.012) 0px,rgba(255,255,255,0.012) 1px,transparent 1px,transparent 8px);
+  pointer-events:none;
+}
+
+.cq-card{
+  background:#2a1f0e;
+  border:1px solid #5a3d12;
+  border-radius:12px;
+  padding:22px 24px;
+  color:#e8d9bc;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  gap:14px;
+}
+
+.cq-title{
+  font-family:Georgia,serif;
+  font-size:26px;
+  font-weight:700;
+  color:#f5c842;
+  letter-spacing:1px;
+  line-height:1.2;
+  font-style:italic;
+}
+.cq-eyebrow{
+  font-size:10px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:#a07840;
+  font-family:var(--font-sans,sans-serif);
+}
+.cq-body{
+  font-size:13px;
+  color:#c4ad88;
+  line-height:1.7;
+  max-width:420px;
+  font-family:var(--font-sans,sans-serif);
+}
+.cq-divider{
+  width:60px;height:1px;
+  background:#5a3d12;
+  flex-shrink:0;
+}
+
+.inst-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  width:100%;
+  max-width:460px;
+  text-align:left;
+}
+.inst-card{
+  background:#1f1608;
+  border:1px solid #4a3010;
+  border-radius:8px;
+  padding:10px 12px;
+  font-size:11.5px;
+  color:#a89070;
+  line-height:1.55;
+  font-family:var(--font-sans,sans-serif);
+}
+.inst-card strong{
+  display:block;
+  font-size:12px;
+  color:#d4b870;
+  margin-bottom:3px;
+}
+
+.cq-btn{
+  background:#c8960a;
+  color:#1a1208;
+  border:none;
+  border-radius:8px;
+  padding:11px 36px;
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  font-family:var(--font-sans,sans-serif);
+  transition:background 0.15s,transform 0.1s;
+  flex-shrink:0;
+}
+.cq-btn:hover{background:#e0a80c;}
+.cq-btn:active{transform:scale(0.97);}
+.cq-btn.secondary{
+  background:transparent;
+  border:1px solid #5a3d12;
+  color:#a07840;
+  padding:8px 24px;
+  font-size:12px;
+}
+.cq-btn.secondary:hover{background:#2a1f0e;color:#d4b870;}
+
+#s-game{
+  display:none;
+  flex-direction:column;
+  gap:0;
+  width:100%;
+}
+#s-game.show{display:flex;}
+
+#g-topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:12px;
+  gap:10px;
+}
+.g-titlesec .gt{
+  font-family:Georgia,serif;
+  font-size:16px;
+  font-weight:700;
+  color:#f5c842;
+  font-style:italic;
+}
+.g-titlesec .gs{
+  font-size:10.5px;
+  color:#7a5a28;
+  margin-top:1px;
+  font-family:var(--font-sans,sans-serif);
+}
+
+.g-pills{display:flex;gap:6px;}
+.gpill{
+  background:#1f1608;
+  border:1px solid #4a3010;
+  border-radius:8px;
+  padding:4px 10px;
+  text-align:center;
+  min-width:56px;
+}
+.gpill .gv{
+  font-size:16px;
+  font-weight:700;
+  color:#f5c842;
+  line-height:1.1;
+  font-family:Georgia,serif;
+}
+.gpill .gl{
+  font-size:9.5px;
+  color:#7a5a28;
+  margin-top:1px;
+  font-family:var(--font-sans,sans-serif);
+}
+.gpill.danger .gv{color:#e05030;}
+
+#g-strikes{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-bottom:10px;
+  padding:7px 10px;
+  background:#1f1608;
+  border:1px solid #3a2808;
+  border-radius:8px;
+}
+.sd{
+  width:16px;height:16px;
+  border-radius:50%;
+  border:1.5px solid #4a3010;
+  background:#2a1f0e;
+  transition:all 0.2s;
+}
+.sd.lit{background:#c0392b;border-color:#e74c3c;box-shadow:0 0 6px rgba(231,76,60,0.5);}
+#s-lbl{
+  font-size:10.5px;
+  color:#7a5a28;
+  margin-left:2px;
+  font-family:var(--font-sans,sans-serif);
+}
+
+#g-msg{
+  min-height:40px;
+  margin-bottom:10px;
+  padding:9px 13px;
+  border-radius:8px;
+  font-size:12px;
+  line-height:1.55;
+  background:#1f1608;
+  border:1px solid #4a3010;
+  color:#c4ad88;
+  font-family:var(--font-sans,sans-serif);
+}
+#g-msg.alert{background:#2a0a08;border-color:#8b2a1a;color:#f09070;}
+#g-msg.success{background:#0a1f0a;border-color:#2a5a1a;color:#70c070;}
+#g-msg.hint{background:#1f1808;border-color:#6a4a08;color:#d4b040;}
+
+#g-wrap{
+  position:relative;
+  border-radius:10px;
+  border:2px solid #5a3d12;
+  overflow:visible;
+  background:#0f0b05;
+  box-shadow:0 0 0 4px #1a1208,0 0 0 5px #3a2808;
+}
+
+canvas{
+  display:block;
+  cursor:pointer;
+  width:100%;
+  border-radius:8px;
+}
+
+#g-tt{
+  position:fixed;
+  background:#2a1f0e;
+  border:1.5px solid #7a5a28;
+  border-radius:10px;
+  padding:10px 13px;
+  font-size:11.5px;
+  line-height:1.6;
+  max-width:220px;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity 0.12s;
+  z-index:9999;
+  color:#c4ad88;
+  box-shadow:0 4px 16px rgba(0,0,0,0.55);
+  font-family:var(--font-sans,sans-serif);
+}
+#g-tt .tn{
+  font-weight:700;
+  font-size:13px;
+  color:#f5c842;
+  margin-bottom:2px;
+  font-family:Georgia,serif;
+  font-style:italic;
+}
+#g-tt .ts{
+  font-size:10px;
+  color:#7a5a28;
+  font-style:italic;
+  margin-bottom:5px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+#g-tt .ta{
+  font-size:11px;
+  color:#a07840;
+  margin-top:6px;
+  padding-top:5px;
+  border-top:1px solid #3a2808;
+  font-style:italic;
+}
+
+#g-ctrl{
+  display:flex;
+  gap:6px;
+  margin-top:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.cq-sm-btn{
+  padding:6px 14px;
+  font-size:11.5px;
+  cursor:pointer;
+  background:#1f1608;
+  border:1px solid #5a3d12;
+  border-radius:7px;
+  color:#a07840;
+  font-family:var(--font-sans,sans-serif);
+  transition:all 0.15s;
+}
+.cq-sm-btn:hover{background:#2a1f0e;color:#d4b870;}
+
+.mb{
+  padding:6px 13px;
+  font-size:11.5px;
+  border-radius:7px;
+  border:1px solid #4a3010;
+  background:#1f1608;
+  color:#7a5a28;
+  cursor:pointer;
+  font-family:var(--font-sans,sans-serif);
+  transition:all 0.15s;
+}
+.mb.on{
+  background:#2a4a1a;
+  border-color:#4a8a2a;
+  color:#80c060;
+  font-weight:500;
+}
+.mb.on-flag{
+  background:#3a1010;
+  border-color:#8a2a1a;
+  color:#e07050;
+  font-weight:500;
+}
+
+#g-leg{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:5px;
+  margin-top:10px;
+}
+.li{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:5px 9px;
+  background:#1f1608;
+  border:1px solid #3a2808;
+  border-radius:7px;
+  font-size:10.5px;
+  color:#7a5a28;
+  font-family:var(--font-sans,sans-serif);
+}
+.lsw{
+  width:22px;height:22px;
+  border-radius:4px;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:13px;
+}
+
+.endcard{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:14px;
+  padding:32px 24px;
+  text-align:center;
+  font-family:var(--font-sans,sans-serif);
+}
+.endcard .ec-icon{font-size:40px;line-height:1;}
+.endcard .ec-title{font-family:Georgia,serif;font-size:28px;font-weight:700;font-style:italic;}
+.endcard .ec-sub{font-size:13px;line-height:1.7;max-width:380px;}
+.endcard .ec-score{font-family:Georgia,serif;font-size:42px;font-weight:700;}
+.endcard .ec-note{font-size:11px;letter-spacing:1px;text-transform:uppercase;}
+.endcard .ec-detail{font-size:11.5px;line-height:1.6;max-width:360px;font-style:italic;}
+.ec-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:4px;}
+
+.over .ec-title{color:#e05030;}
+.over .ec-sub{color:#a06050;}
+.over .ec-detail{color:#7a4030;}
+
+.win .ec-title{color:#f5c842;}
+.win .ec-sub{color:#c4a850;}
+.win .ec-score{color:#f5c842;}
+.win .ec-note{color:#7a6030;}
+.win .ec-detail{color:#a08040;}
+</style>
+
+<div id="cq-shell">
+
+  <!-- START -->
+  <div class="cq-card" id="s-start">
+    <div class="cq-eyebrow">1857 &middot; Underground Railroad</div>
+    <div class="cq-title">Cipher Quilt</div>
+    <div class="cq-divider"></div>
+    <div class="cq-body">A quilt hangs outside a safe house. Hidden within its stitched patterns is the route to freedom — but patrol agents watch every road. Read the cloth carefully. Every choice matters.</div>
+    <div class="inst-grid">
+      <div class="inst-card"><strong>Mission</strong>Find all 8 safe passages in the 4&times;4 grid to reach freedom.</div>
+      <div class="inst-card"><strong>How to read</strong>Hover any patch for its historical context. History is your only clue.</div>
+      <div class="inst-card"><strong>Mark safe / Flag danger</strong>Toggle modes below the board to make your call on each patch.</div>
+      <div class="inst-card"><strong>Strikes</strong>4 wrong clicks and patrols are alerted. Game over.</div>
+      <div class="inst-card"><strong>Unknown paths</strong>Plain cloth hides a pattern — click once to reveal it, then decide.</div>
+      <div class="inst-card"><strong>Victory</strong>Find all 8 safe squares to attain freedom. Fewer strikes = higher score.</div>
+    </div>
+    <button class="cq-btn" onclick="startGame()">PLAY</button>
+  </div>
+
+  <!-- GAME -->
+  <div id="s-game">
+    <div id="g-topbar">
+      <div class="g-titlesec">
+        <div class="gt">Cipher Quilt</div>
+        <div class="gs">Find all 8 safe passages</div>
+      </div>
+      <div class="g-pills">
+        <div class="gpill"><div class="gv" id="p-found">0</div><div class="gl">safe found</div></div>
+        <div class="gpill danger"><div class="gv" id="p-str">0<span style="font-size:10px;font-weight:400">/4</span></div><div class="gl">strikes</div></div>
+      </div>
+    </div>
+
+    <div id="g-strikes">
+      <div class="sd" id="sd0"></div>
+      <div class="sd" id="sd1"></div>
+      <div class="sd" id="sd2"></div>
+      <div class="sd" id="sd3"></div>
+      <span id="s-lbl">Patrol alerts &mdash; 4 and you&rsquo;re caught</span>
+    </div>
+
+    <div id="g-msg">Hover any patch to read its historical context, then use the modes below to mark it.</div>
+
+    <div id="g-wrap">
+      <canvas id="cqc"></canvas>
+    </div>
+
+    <div id="g-ctrl">
+      <button class="cq-sm-btn" onclick="showStart()">Quit</button>
+      <button class="cq-sm-btn" onclick="doHint()">Request clue</button>
+      <button class="mb on" id="mb-safe" onclick="setMode('safe')">&#10003; Mark safe</button>
+      <button class="mb" id="mb-flag" onclick="setMode('flag')">&#9873; Flag danger</button>
+    </div>
+
+    <div id="g-leg">
+      <div class="li"><div class="lsw" style="background:#b8832a">&#9670;</div>Flying Geese</div>
+      <div class="li"><div class="lsw" style="background:#2e5e3a">&#9733;</div>North Star</div>
+      <div class="li"><div class="lsw" style="background:#5533a8">&#9632;</div>Bear&rsquo;s Paw</div>
+      <div class="li"><div class="lsw" style="background:#155a8a">&#8855;</div>Bow Ties</div>
+      <div class="li"><div class="lsw" style="background:#922e24">&#9670;</div>Crossroads</div>
+      <div class="li"><div class="lsw" style="background:#4a5560">&#9632;</div>Log Cabin</div>
+      <div class="li"><div class="lsw" style="background:#2a1f0e;border:1px solid #5a3d12;color:#7a5a28">?</div>Unknown path</div>
+    </div>
+  </div>
+
+  <!-- GAME OVER -->
+  <div class="cq-card" id="s-over" style="display:none">
+    <div class="endcard over">
+      <div class="ec-icon">&#9888;</div>
+      <div class="ec-title">Game Over</div>
+      <div class="ec-sub">You triggered 4 patrol alerts. The route has been compromised. The conductors will re-stitch the quilt and try again when it is safe.</div>
+      <div class="ec-detail" id="go-detail"></div>
+      <div class="ec-btns">
+        <button class="cq-btn" onclick="startGame()">Try again</button>
+        <button class="cq-btn secondary" onclick="showStart()">Back to start</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VICTORY -->
+  <div class="cq-card" id="s-win" style="display:none">
+    <div class="endcard win">
+      <div class="ec-icon">&#9733;</div>
+      <div class="ec-title">Freedom Attained</div>
+      <div class="ec-sub" id="win-sub">You decoded the quilt and navigated every safe passage. The conductors of the Underground Railroad guided you well.</div>
+      <div class="ec-score" id="win-score">100</div>
+      <div class="ec-note">points scored</div>
+      <div class="ec-detail" id="win-detail"></div>
+      <div class="ec-btns">
+        <button class="cq-btn" onclick="startGame()">Play again</button>
+        <button class="cq-btn secondary" onclick="showStart()">Back to start</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="g-tt"><div class="tn" id="tt-name"></div><div class="ts">Historical context</div><div id="tt-body"></div><div class="ta" id="tt-lore"></div></div>
+
+<script>
+const PATS=[
+  {id:'goose',name:'Flying Geese',sym:'goose',col:'#b8832a',safe:true,
+   ctx:'Rows of upward-pointing triangles guided travelers north toward Canada. Conductors stitched this to signal the direction of travel — always follow the flock.',
+   lore:'The geese always fly north toward freedom.'},
+  {id:'star',name:'North Star',sym:'star',col:'#2e5e3a',safe:true,
+   ctx:'The eight-pointed star represented Polaris — fixed in the night sky. Harriet Tubman told freedom seekers to follow it without fail. A reliable beacon of sanctuary.',
+   lore:'Follow the star that never moves.'},
+  {id:'bear',name:"Bear's Paw",sym:'bear',col:'#5533a8',safe:true,
+   ctx:"Bears know mountain passes and water sources. This pattern marked reliable trails through Appalachian terrain. Trust the animal's instinct — it leads to safe ground.",
+   lore:'The bear leaves tracks worth following.'},
+  {id:'bow',name:'Bow Ties',sym:'bow',col:'#155a8a',safe:true,
+   ctx:"Bow Tie quilts hung at a conductor's home signaled a safe house — food, shelter, and the next leg of the journey awaited inside.",
+   lore:'Where the cloth is dressed well, the door is open.'},
+  {id:'cross',name:'Crossroads',sym:'cross',col:'#922e24',safe:false,
+   ctx:'Crossroads were watched by slave catchers. The diamond pattern warned travelers to avoid open intersections and stick to the tree line.',
+   lore:'Where paths cross openly, so do eyes.'},
+  {id:'cabin',name:'Log Cabin',sym:'cabin',col:'#4a5560',safe:false,
+   ctx:'A Log Cabin quilt with a dark center warned of an overseer or bounty hunter. The dark hearth means no welcome. Pass quickly.',
+   lore:'When the center is dark, the house is not safe.'},
+];
+const BLANK={id:'blank',name:'Unknown path',sym:'blank',col:null,
+  ctx:'Plain cloth — no pattern stitched here. But conductors also used bare fabric deliberately: sometimes marking a hidden route, sometimes laying a trap.',
+  lore:'Silence can mean safety or snare.'};
+
+const G=4,TOTAL=16,MAX_STRIKES=4,NEED_SAFE=8;
+let board=[],mode='safe',strikes=0,found=0,gone=false,hov=-1;
+let cv,cx2,cs,DPR=window.devicePixelRatio||1;
+
+function showStart(){
+  document.getElementById('s-start').style.display='';
+  document.getElementById('s-game').style.display='none';
+  document.getElementById('s-over').style.display='none';
+  document.getElementById('s-win').style.display='none';
+  hideTT();
+}
+function showGame(){
+  document.getElementById('s-start').style.display='none';
+  document.getElementById('s-game').style.display='flex';
+  document.getElementById('s-over').style.display='none';
+  document.getElementById('s-win').style.display='none';
+}
+function showOver(){
+  document.getElementById('s-start').style.display='none';
+  document.getElementById('s-game').style.display='none';
+  document.getElementById('s-over').style.display='';
+  document.getElementById('s-win').style.display='none';
+}
+function showWin(){
+  document.getElementById('s-start').style.display='none';
+  document.getElementById('s-game').style.display='none';
+  document.getElementById('s-over').style.display='none';
+  document.getElementById('s-win').style.display='';
+}
+
+function startGame(){
+  strikes=0;found=0;gone=false;hov=-1;
+  setMode('safe');
+  updStrikes();
+  setMsg('Hover any patch to read its historical context, then use the modes below to mark it.','');
+
+  const safePats=PATS.filter(p=>p.safe);
+  const dangPats=PATS.filter(p=>!p.safe);
+  const nNS=4,nND=2,nB=TOTAL-nNS-nND;
+  const nBS=Math.ceil(nB/2),nBD=nB-nBS;
+
+  let pool=[];
+  const ss=[...safePats].sort(()=>Math.random()-0.5);
+  const sd=[...dangPats].sort(()=>Math.random()-0.5);
+  for(let i=0;i<nNS;i++) pool.push({pat:{...ss[i%ss.length]},isSafe:true,isBlank:false,revealed:false,state:'hidden'});
+  for(let i=0;i<nND;i++) pool.push({pat:{...sd[i%sd.length]},isSafe:false,isBlank:false,revealed:false,state:'hidden'});
+  for(let i=0;i<nBS;i++) pool.push({pat:{...BLANK},isSafe:true,isBlank:true,revealed:false,state:'hidden'});
+  for(let i=0;i<nBD;i++) pool.push({pat:{...BLANK},isSafe:false,isBlank:true,revealed:false,state:'hidden'});
+  pool.sort(()=>Math.random()-0.5);
+  board=pool;
+
+  document.getElementById('p-found').textContent='0';
+  document.getElementById('p-str').innerHTML='0<span style="font-size:10px;font-weight:400">/4</span>';
+  showGame();
+  setTimeout(()=>{ sizeCanvas(); redraw(); },40);
+}
+
+function setMode(m){
+  mode=m;
+  const ms=document.getElementById('mb-safe');
+  const mf=document.getElementById('mb-flag');
+  ms.className='mb'+(m==='safe'?' on':'');
+  mf.className='mb'+(m==='flag'?' on-flag':'');
+}
+
+function setMsg(html,type){
+  const el=document.getElementById('g-msg');
+  el.innerHTML=html;el.className=type||'';
+}
+
+function updStrikes(){
+  for(let i=0;i<4;i++) document.getElementById('sd'+i).classList.toggle('lit',i<strikes);
+  document.getElementById('p-str').innerHTML=`${strikes}<span style="font-size:10px;font-weight:400">/4</span>`;
+}
+
+function doHint(){
+  const pool=board.filter(c=>c.state==='hidden');
+  if(!pool.length){setMsg('No more hidden patches.','hint');return;}
+  const c=pool[Math.floor(Math.random()*pool.length)];
+  setMsg('<strong>Conductor\'s whisper:</strong> '+c.pat.lore,'hint');
+}
+
+function ciAt(x,y){
+  const col=Math.floor(x/cs),row=Math.floor(y/cs);
+  if(col<0||col>=G||row<0||row>=G) return -1;
+  return row*G+col;
+}
+
+function drawGoose(x,y,col,s){
+  cx2.fillStyle=col;
+  const cx=x+s/2,cy=y+s/2;
+  for(let r=0;r<3;r++){
+    const ty=cy-s*0.19+r*s*0.165;
+    cx2.beginPath();
+    cx2.moveTo(cx,ty-s*0.088);
+    cx2.lineTo(cx-s*0.125,ty+s*0.07);
+    cx2.lineTo(cx+s*0.125,ty+s*0.07);
+    cx2.closePath();cx2.fill();
+  }
+}
+function drawStar(x,y,col,s){
+  const cx=x+s/2,cy=y+s/2,ro=s*0.27,ri=s*0.115,pts=8;
+  cx2.fillStyle=col;cx2.beginPath();
+  for(let p=0;p<pts*2;p++){
+    const a=(p*Math.PI/pts)-Math.PI/2,r=p%2===0?ro:ri;
+    const px=cx+Math.cos(a)*r,py=cy+Math.sin(a)*r;
+    p===0?cx2.moveTo(px,py):cx2.lineTo(px,py);
+  }
+  cx2.closePath();cx2.fill();
+}
+function drawBear(x,y,col,s){
+  const cx=x+s/2,cy=y+s/2,bs=s*0.145;
+  cx2.fillStyle=col;
+  [[-0.21,-0.21],[0.21,-0.21],[-0.21,0.21],[0.21,0.21],[0,0]].forEach(([ox,oy])=>{
+    cx2.fillRect(cx+ox*s-bs/2,cy+oy*s-bs/2,bs,bs);
+  });
+}
+function drawBow(x,y,col,s){
+  const cx=x+s/2,cy=y+s/2;
+  cx2.fillStyle=col;
+  cx2.beginPath();cx2.moveTo(cx-s*0.24,cy-s*0.18);cx2.lineTo(cx,cy);cx2.lineTo(cx-s*0.24,cy+s*0.18);cx2.closePath();cx2.fill();
+  cx2.beginPath();cx2.moveTo(cx+s*0.24,cy-s*0.18);cx2.lineTo(cx,cy);cx2.lineTo(cx+s*0.24,cy+s*0.18);cx2.closePath();cx2.fill();
+  cx2.fillStyle='rgba(255,255,255,0.3)';cx2.beginPath();cx2.arc(cx,cy,s*0.05,0,Math.PI*2);cx2.fill();
+}
+function drawCross(x,y,col,s){
+  const cx=x+s/2,cy=y+s/2;
+  cx2.fillStyle=col;
+  cx2.beginPath();cx2.moveTo(cx,cy-s*0.27);cx2.lineTo(cx+s*0.165,cy);cx2.lineTo(cx,cy+s*0.27);cx2.lineTo(cx-s*0.165,cy);cx2.closePath();cx2.fill();
+  cx2.strokeStyle='rgba(255,255,255,0.18)';cx2.lineWidth=s*0.045;
+  cx2.beginPath();cx2.moveTo(cx,cy-s*0.24);cx2.lineTo(cx,cy+s*0.24);cx2.stroke();
+  cx2.beginPath();cx2.moveTo(cx-s*0.13,cy);cx2.lineTo(cx+s*0.13,cy);cx2.stroke();
+}
+function drawCabin(x,y,col,s){
+  const cx=x+s/2,cy=y+s/2,sq=s*0.46;
+  cx2.fillStyle=col;cx2.fillRect(cx-sq/2,cy-sq/2,sq,sq);
+  cx2.fillStyle='rgba(0,0,0,0.55)';cx2.beginPath();cx2.arc(cx,cy,s*0.11,0,Math.PI*2);cx2.fill();
+}
+function drawUnknown(x,y,s,isHov){
+  const cx=x+s/2,cy=y+s/2;
+  cx2.globalAlpha=isHov?0.5:0.28;
+  cx2.strokeStyle='#7a5a28';cx2.lineWidth=0.8;
+  const step=s/5;
+  cx2.beginPath();
+  for(let i=1;i<5;i++){
+    cx2.moveTo(x+i*step,y);cx2.lineTo(x+i*step,y+s);
+    cx2.moveTo(x,y+i*step);cx2.lineTo(x+s,y+i*step);
+  }
+  cx2.stroke();
+  cx2.globalAlpha=isHov?0.7:0.4;
+  cx2.fillStyle='#a07840';
+  cx2.font=`500 ${s*0.16}px var(--font-sans,sans-serif)`;
+  cx2.textAlign='center';cx2.textBaseline='middle';
+  cx2.fillText('unknown path',cx,cy);
+  cx2.globalAlpha=1;
+}
+
+function drawCell(idx){
+  const col=idx%G,row=Math.floor(idx/G);
+  const x=col*cs,y=row*cs,s=cs;
+  const cell=board[idx];
+  const isH=hov===idx;
+
+  cx2.save();cx2.beginPath();cx2.rect(x,y,s,s);cx2.clip();
+
+  let bg='#1e1508';
+  if(cell.state==='correct') bg='#0e2010';
+  else if(cell.state==='flagged') bg='#200a08';
+  else if(cell.state==='wrong') bg='#2a0808';
+  else if(isH) bg='#2a1e0a';
+  cx2.fillStyle=bg;cx2.fillRect(x,y,s,s);
+
+  const pat=cell.pat;
+  const isBlankUnrev=cell.isBlank&&!cell.revealed;
+  if(isBlankUnrev){
+    drawUnknown(x,y,s,isH);
+  } else {
+    cx2.globalAlpha=(cell.state==='hidden'&&!isH)?0.55:0.95;
+    if(pat.sym==='goose') drawGoose(x,y,pat.col,s);
+    else if(pat.sym==='star') drawStar(x,y,pat.col,s);
+    else if(pat.sym==='bear') drawBear(x,y,pat.col,s);
+    else if(pat.sym==='bow') drawBow(x,y,pat.col,s);
+    else if(pat.sym==='cross') drawCross(x,y,pat.col,s);
+    else if(pat.sym==='cabin') drawCabin(x,y,pat.col,s);
+    cx2.globalAlpha=1;
+  }
+
+  if(cell.state==='correct'){
+    cx2.strokeStyle='#2e7d4a';cx2.lineWidth=2.5;cx2.strokeRect(x+2,y+2,s-4,s-4);
+    cx2.fillStyle='#50c070';cx2.font=`bold ${s*0.22}px sans-serif`;
+    cx2.textAlign='right';cx2.textBaseline='top';cx2.fillText('✓',x+s-5,y+5);
+  } else if(cell.state==='flagged'){
+    cx2.strokeStyle='#8b2a1a';cx2.lineWidth=2;cx2.setLineDash([5,3]);cx2.strokeRect(x+2,y+2,s-4,s-4);cx2.setLineDash([]);
+    cx2.fillStyle='#e07050';cx2.font=`bold ${s*0.22}px sans-serif`;
+    cx2.textAlign='right';cx2.textBaseline='top';cx2.fillText('⚑',x+s-5,y+5);
+  } else if(cell.state==='wrong'){
+    cx2.strokeStyle='#c03020';cx2.lineWidth=3;cx2.strokeRect(x+2,y+2,s-4,s-4);
+    cx2.fillStyle='#e05030';cx2.font=`bold ${s*0.3}px sans-serif`;
+    cx2.textAlign='center';cx2.textBaseline='middle';cx2.fillText('✕',x+s/2,y+s/2);
+  }
+
+  if(isH&&cell.state==='hidden'){
+    cx2.strokeStyle='#f5c842';cx2.lineWidth=2;cx2.strokeRect(x+1.5,y+1.5,s-3,s-3);
+  }
+
+  cx2.strokeStyle='rgba(255,200,80,0.12)';cx2.lineWidth=0.5;cx2.strokeRect(x,y,s,s);
+  cx2.restore();
+}
+
+function redraw(){
+  for(let i=0;i<TOTAL;i++) drawCell(i);
+}
+
+function sizeCanvas(){
+  const wrap=document.getElementById('g-wrap');
+  const W=wrap.clientWidth||580;
+  cs=Math.floor(W/G);
+  cv.width=cs*G*DPR;cv.height=cs*G*DPR;
+  cv.style.width=cs*G+'px';cv.style.height=cs*G+'px';
+  cx2.setTransform(1,0,0,1,0,0);cx2.scale(DPR,DPR);
+}
+
+function showTT(idx,pageX,pageY){
+  const tt=document.getElementById('g-tt');
+  const cell=board[idx];
+  if(!cell||gone){tt.style.opacity='0';return;}
+  const isBlankUnrev=cell.isBlank&&!cell.revealed;
+  const p=isBlankUnrev?BLANK:cell.pat;
+  document.getElementById('tt-name').textContent=isBlankUnrev?'Unknown path':p.name;
+  document.getElementById('tt-body').textContent=p.ctx;
+  document.getElementById('tt-lore').textContent='"'+p.lore+'"';
+
+  tt.style.opacity='0';
+  tt.style.left='0px';tt.style.top='0px';
+  tt.style.display='block';
+  const ttW=tt.offsetWidth||220,ttH=tt.offsetHeight||120;
+
+  const margin=14;
+  let tx=pageX+margin,ty=pageY-ttH/2;
+  if(tx+ttW>window.innerWidth-8) tx=pageX-ttW-margin;
+  if(ty<8) ty=8;
+  if(ty+ttH>window.innerHeight-8) ty=window.innerHeight-ttH-8;
+
+  tt.style.left=tx+'px';tt.style.top=ty+'px';tt.style.opacity='1';
+}
+function hideTT(){
+  document.getElementById('g-tt').style.opacity='0';
+}
+
+function triggerGameOver(){
+  gone=true;hideTT();
+  const missed=board.filter(c=>c.isSafe&&c.state!=='correct').length;
+  document.getElementById('go-detail').textContent=`${missed} safe passage${missed!==1?'s':''} remained uncovered. The conductors will re-stitch the quilt.`;
+  setTimeout(showOver,700);
+}
+function triggerVictory(){
+  gone=true;hideTT();
+  const score=Math.max(10,100-strikes*12);
+  document.getElementById('win-score').textContent=score;
+  const perfect=strikes===0;
+  document.getElementById('win-sub').textContent=perfect
+    ?'You navigated the full escape route without triggering a single patrol alert. A perfect reading of the cloth.'
+    :`You found all 8 safe passages with ${strikes} patrol alert${strikes!==1?'s':''}. The conductors are proud.`;
+  document.getElementById('win-detail').textContent=perfect
+    ?'"The stars aligned and the geese flew true."'
+    :'"Freedom is not given — it is decoded, one careful step at a time."';
+  setTimeout(showWin,500);
+}
+
+function handleClick(idx){
+  if(gone) return;
+  const cell=board[idx];
+  if(cell.state==='correct'||cell.state==='flagged') return;
+
+  if(cell.isBlank&&!cell.revealed){
+    cell.revealed=true;drawCell(idx);
+    setMsg(`<strong>${cell.pat.name} revealed.</strong> ${cell.pat.ctx} Now decide — safe or danger?`,'hint');
+    return;
+  }
+
+  const wantSafe=mode==='safe';
+  const correct=wantSafe===cell.isSafe;
+
+  if(correct){
+    cell.state=wantSafe?'correct':'flagged';found++;
+    document.getElementById('p-found').textContent=found;
+    setMsg(`<strong>${wantSafe?'Safe passage confirmed.':'Danger zone flagged.'}</strong> ${cell.pat.ctx}`,'success');
+    drawCell(idx);
+    if(found>=NEED_SAFE) triggerVictory();
+  } else {
+    cell.state='wrong';strikes++;
+    updStrikes();
+    setMsg(`<strong>Patrol Alert!</strong> ${wantSafe?'That patch is not a safe passage.':'That patch is not a danger zone.'} ${cell.pat.ctx}`,'alert');
+    drawCell(idx);
+    setTimeout(()=>{
+      if(board[idx]&&board[idx].state==='wrong'){board[idx].state='hidden';drawCell(idx);}
+    },1400);
+    if(strikes>=MAX_STRIKES) triggerGameOver();
+  }
+}
+
+cv=document.getElementById('cqc');
+cx2=cv.getContext('2d');
+
+cv.addEventListener('mousemove',e=>{
+  const r=cv.getBoundingClientRect();
+  const sc=cs*G/r.width;
+  const mx=(e.clientX-r.left)*sc,my=(e.clientY-r.top)*sc;
+  const idx=ciAt(mx,my);
+  const prev=hov;hov=idx;
+  if(prev!==idx){if(prev>=0)drawCell(prev);if(idx>=0)drawCell(idx);}
+  if(idx>=0) showTT(idx,e.clientX,e.clientY);
+  else hideTT();
+});
+
+cv.addEventListener('mouseleave',()=>{
+  const p=hov;hov=-1;hideTT();
+  if(p>=0) drawCell(p);
+});
+
+cv.addEventListener('click',e=>{
+  if(gone) return;
+  const r=cv.getBoundingClientRect();
+  const sc=cs*G/r.width;
+  const mx=(e.clientX-r.left)*sc,my=(e.clientY-r.top)*sc;
+  const idx=ciAt(mx,my);
+  if(idx>=0) handleClick(idx);
+});
+
+window.addEventListener('resize',()=>{
+  if(document.getElementById('s-game').style.display==='flex'){
+    sizeCanvas();redraw();
+  }
+});
+</script>
