@@ -1,0 +1,794 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+#cq-shell{
+  background:#0d0a05;
+  border:2px solid #8a6020;
+  border-radius:16px;
+  padding:18px;
+  max-width:640px;
+  margin:8px auto;
+  min-height:480px;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 0 0 1px #3a2808 inset;
+}
+
+#cq-shell::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:14px;
+  background:repeating-linear-gradient(45deg,rgba(255,200,80,0.018) 0px,rgba(255,200,80,0.018) 1px,transparent 1px,transparent 9px);
+  pointer-events:none;
+}
+
+/* ── CARD BASE ─────────────────────────────── */
+.cq-card{
+  background:#1a1205;
+  border:1px solid #6a4a18;
+  border-radius:12px;
+  padding:22px 24px;
+  color:#e8d9bc;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  gap:14px;
+}
+
+/* ── TYPOGRAPHY ────────────────────────────── */
+.cq-title{
+  font-family:Georgia,serif;
+  font-size:28px;
+  font-weight:700;
+  color:#fdd75a;
+  letter-spacing:1px;
+  line-height:1.2;
+  font-style:italic;
+  text-shadow:0 1px 8px rgba(253,215,90,0.3);
+}
+.cq-eyebrow{
+  font-size:10px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:#c09040;
+  font-family:var(--font-sans,sans-serif);
+}
+.cq-body{
+  font-size:13px;
+  color:#d4b878;
+  line-height:1.7;
+  max-width:420px;
+  font-family:var(--font-sans,sans-serif);
+}
+.cq-divider{width:60px;height:1px;background:#6a4a18;flex-shrink:0}
+
+/* ── INSTRUCTION GRID ──────────────────────── */
+.inst-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  width:100%;
+  max-width:460px;
+  text-align:left;
+}
+.inst-card{
+  background:#110e04;
+  border:1px solid #4a3412;
+  border-radius:8px;
+  padding:10px 12px;
+  font-size:11.5px;
+  color:#b09060;
+  line-height:1.55;
+  font-family:var(--font-sans,sans-serif);
+}
+.inst-card strong{
+  display:block;
+  font-size:12px;
+  color:#fdd75a;
+  margin-bottom:3px;
+}
+
+/* ── BUTTONS ───────────────────────────────── */
+.cq-btn{
+  background:#c8960a;
+  color:#0d0a05;
+  border:none;
+  border-radius:8px;
+  padding:11px 36px;
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  font-family:var(--font-sans,sans-serif);
+  transition:background 0.15s,transform 0.1s;
+  flex-shrink:0;
+  box-shadow:0 2px 10px rgba(200,150,10,0.35);
+}
+.cq-btn:hover{background:#e0a80c;}
+.cq-btn:active{transform:scale(0.97);}
+.cq-btn.secondary{
+  background:transparent;
+  border:1px solid #5a3d12;
+  color:#c09040;
+  padding:8px 24px;
+  font-size:12px;
+  box-shadow:none;
+}
+.cq-btn.secondary:hover{background:#1a1205;color:#fdd75a;}
+
+/* ── GAME LAYOUT ───────────────────────────── */
+#s-game{display:none;flex-direction:column;gap:0;width:100%}
+#s-game.show{display:flex}
+
+#g-topbar{
+  display:flex;align-items:center;
+  justify-content:space-between;
+  margin-bottom:12px;gap:10px;
+}
+.g-titlesec .gt{
+  font-family:Georgia,serif;
+  font-size:16px;font-weight:700;
+  color:#fdd75a;font-style:italic;
+  text-shadow:0 1px 6px rgba(253,215,90,0.25);
+}
+.g-titlesec .gs{font-size:10.5px;color:#7a5a28;margin-top:1px;font-family:var(--font-sans,sans-serif)}
+
+/* ── PILLS ─────────────────────────────────── */
+.g-pills{display:flex;gap:6px}
+.gpill{
+  background:#110e04;
+  border:1px solid #4a3412;
+  border-radius:8px;padding:4px 10px;
+  text-align:center;min-width:56px;
+}
+.gpill .gv{font-size:17px;font-weight:700;color:#fdd75a;line-height:1.1;font-family:Georgia,serif}
+.gpill .gl{font-size:9.5px;color:#7a5a28;margin-top:1px;font-family:var(--font-sans,sans-serif)}
+.gpill.danger .gv{color:#f06040}
+
+/* ── STRIKES ───────────────────────────────── */
+#g-strikes{
+  display:flex;align-items:center;gap:6px;
+  margin-bottom:10px;padding:7px 10px;
+  background:#110e04;
+  border:1px solid #3a2808;
+  border-radius:8px;
+}
+.sd{
+  width:17px;height:17px;border-radius:50%;
+  border:1.5px solid #4a3010;background:#1a1205;
+  transition:all 0.2s;
+}
+.sd.lit{
+  background:#d03020;border-color:#f05030;
+  box-shadow:0 0 8px rgba(240,80,48,0.6);
+}
+#s-lbl{font-size:10.5px;color:#7a5a28;margin-left:3px;font-family:var(--font-sans,sans-serif)}
+
+/* ── MESSAGE BAR ───────────────────────────── */
+#g-msg{
+  min-height:42px;margin-bottom:10px;
+  padding:9px 13px;border-radius:8px;
+  font-size:12px;line-height:1.55;
+  background:#110e04;
+  border:1px solid #4a3412;
+  color:#d4b878;
+  font-family:var(--font-sans,sans-serif);
+}
+#g-msg b,#g-msg strong{color:#fdd75a}
+#g-msg.alert{background:#200806;border-color:#8b2010;color:#f09070}
+#g-msg.alert b,#g-msg.alert strong{color:#ffb090}
+#g-msg.success{background:#071408;border-color:#1e5a12;color:#70d070}
+#g-msg.success b,#g-msg.success strong{color:#90f090}
+#g-msg.hint{background:#100e04;border-color:#7a5a08;color:#d8b848}
+#g-msg.hint b,#g-msg.hint strong{color:#fdd75a}
+
+/* ── CANVAS WRAP ───────────────────────────── */
+#g-wrap{
+  position:relative;
+  border-radius:10px;
+  border:2px solid #8a6020;
+  overflow:visible;
+  background:#080602;
+  box-shadow:0 0 0 3px #0d0a05,0 0 0 4px #4a3010,0 4px 20px rgba(0,0,0,0.7);
+}
+canvas{display:block;cursor:pointer;width:100%;border-radius:8px}
+
+/* ── TOOLTIP ───────────────────────────────── */
+#g-tt{
+  position:fixed;
+  background:#1e1608;
+  border:1.5px solid #9a7030;
+  border-radius:11px;
+  padding:11px 14px;
+  font-size:12px;
+  line-height:1.65;
+  width:230px;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity 0.1s;
+  z-index:9999;
+  color:#d4b878;
+  box-shadow:0 6px 24px rgba(0,0,0,0.75),0 0 0 1px #0d0a05 inset;
+  font-family:var(--font-sans,sans-serif);
+}
+#g-tt::before{
+  content:'';
+  position:absolute;
+  inset:0;border-radius:10px;
+  background:repeating-linear-gradient(45deg,rgba(255,200,80,0.025) 0,rgba(255,200,80,0.025) 1px,transparent 1px,transparent 7px);
+  pointer-events:none;
+}
+#g-tt .tn{
+  font-weight:700;font-size:14px;
+  color:#fdd75a;margin-bottom:3px;
+  font-family:Georgia,serif;font-style:italic;
+  text-shadow:0 1px 6px rgba(253,215,90,0.35);
+}
+#g-tt .ts{
+  font-size:9.5px;color:#8a6828;
+  font-style:italic;margin-bottom:6px;
+  text-transform:uppercase;letter-spacing:1.5px;
+}
+#g-tt .tb{font-size:11.5px;color:#c8a860;line-height:1.6}
+#g-tt .ta{
+  font-size:11px;color:#9a7830;
+  margin-top:7px;padding-top:6px;
+  border-top:1px solid #3a2808;
+  font-style:italic;line-height:1.5;
+}
+
+/* ── CONTROLS ──────────────────────────────── */
+#g-ctrl{display:flex;gap:6px;margin-top:10px;align-items:center;flex-wrap:wrap}
+.cq-sm-btn{
+  padding:6px 13px;font-size:11.5px;cursor:pointer;
+  background:#110e04;border:1px solid #5a3d12;
+  border-radius:7px;color:#b09060;
+  font-family:var(--font-sans,sans-serif);transition:all 0.15s;
+}
+.cq-sm-btn:hover{background:#1a1205;color:#fdd75a;border-color:#8a6020}
+.mb{
+  padding:6px 13px;font-size:11.5px;border-radius:7px;
+  border:1px solid #4a3010;background:#110e04;
+  color:#7a5a28;cursor:pointer;
+  font-family:var(--font-sans,sans-serif);transition:all 0.15s;
+}
+.mb.on{background:#0e2010;border-color:#2a6a18;color:#80e060;font-weight:600}
+.mb.on-flag{background:#200808;border-color:#8a2010;color:#f07050;font-weight:600}
+
+/* ── LEGEND ────────────────────────────────── */
+#g-leg{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(138px,1fr));
+  gap:5px;margin-top:10px;
+}
+.li{
+  display:flex;align-items:center;gap:7px;
+  padding:5px 9px;
+  background:#110e04;
+  border:1px solid #3a2808;
+  border-radius:7px;
+  font-size:10.5px;color:#9a7840;
+  font-family:var(--font-sans,sans-serif);
+}
+.lsw{
+  width:22px;height:22px;border-radius:4px;
+  flex-shrink:0;display:flex;
+  align-items:center;justify-content:center;
+  font-size:13px;
+}
+
+/* ── END CARDS ─────────────────────────────── */
+.endcard{
+  display:flex;flex-direction:column;
+  align-items:center;gap:14px;
+  padding:28px 24px;text-align:center;
+  font-family:var(--font-sans,sans-serif);
+}
+.endcard .ec-icon{font-size:42px;line-height:1}
+.endcard .ec-title{font-family:Georgia,serif;font-size:28px;font-weight:700;font-style:italic}
+.endcard .ec-sub{font-size:13px;line-height:1.7;max-width:380px}
+.endcard .ec-score{font-family:Georgia,serif;font-size:44px;font-weight:700}
+.endcard .ec-note{font-size:11px;letter-spacing:1.5px;text-transform:uppercase}
+.endcard .ec-detail{font-size:12px;line-height:1.6;max-width:360px;font-style:italic}
+.ec-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+
+.over .ec-title{color:#f07050}
+.over .ec-sub{color:#b07060}
+.over .ec-detail{color:#8a5040}
+
+.win .ec-title{color:#fdd75a;text-shadow:0 2px 12px rgba(253,215,90,0.4)}
+.win .ec-sub{color:#d4a850}
+.win .ec-score{color:#fdd75a;text-shadow:0 2px 16px rgba(253,215,90,0.5)}
+.win .ec-note{color:#8a6828}
+.win .ec-detail{color:#a08040}
+</style>
+
+<div id="cq-shell">
+
+  <!-- START -->
+  <div class="cq-card" id="s-start">
+    <div class="cq-eyebrow">1857 &middot; Underground Railroad</div>
+    <div class="cq-title">Cipher Quilt</div>
+    <div class="cq-divider"></div>
+    <div class="cq-body">A quilt hangs outside a safe house. Hidden within its stitched patterns is the route to freedom — but patrol agents watch every road. Read the cloth carefully. Every choice matters.</div>
+    <div class="inst-grid">
+      <div class="inst-card"><strong>Mission</strong>Find all 8 safe passages in the 4&times;4 grid to reach freedom.</div>
+      <div class="inst-card"><strong>How to read</strong>Hover any patch for its historical context. History is your only clue.</div>
+      <div class="inst-card"><strong>Mark safe / Flag danger</strong>Toggle modes below the board to make your call on each patch.</div>
+      <div class="inst-card"><strong>Strikes</strong>4 wrong clicks and patrols are alerted. Game over.</div>
+      <div class="inst-card"><strong>Unknown paths</strong>Plain cloth hides a pattern — click once to reveal, then decide.</div>
+      <div class="inst-card"><strong>Victory</strong>Find all 8 safe squares to attain freedom. Fewer strikes = higher score.</div>
+    </div>
+    <button class="cq-btn" onclick="startGame()">PLAY</button>
+  </div>
+
+  <!-- GAME -->
+  <div id="s-game">
+    <div id="g-topbar">
+      <div class="g-titlesec">
+        <div class="gt">Cipher Quilt</div>
+        <div class="gs">Find all 8 safe passages to attain freedom</div>
+      </div>
+      <div class="g-pills">
+        <div class="gpill"><div class="gv" id="p-found">0</div><div class="gl">safe found</div></div>
+        <div class="gpill danger"><div class="gv" id="p-str">0<span style="font-size:10px;font-weight:400">/4</span></div><div class="gl">strikes</div></div>
+      </div>
+    </div>
+
+    <div id="g-strikes">
+      <div class="sd" id="sd0"></div>
+      <div class="sd" id="sd1"></div>
+      <div class="sd" id="sd2"></div>
+      <div class="sd" id="sd3"></div>
+      <span id="s-lbl">Patrol alerts &mdash; 4 and you&rsquo;re caught</span>
+    </div>
+
+    <div id="g-msg">Hover any patch to read its historical context. Select a mode below, then click to make your call.</div>
+
+    <div id="g-wrap">
+      <canvas id="cqc"></canvas>
+    </div>
+
+    <div id="g-ctrl">
+      <button class="cq-sm-btn" onclick="showStart()">Quit</button>
+      <button class="cq-sm-btn" onclick="doHint()">Request clue</button>
+      <button class="mb on" id="mb-safe" onclick="setMode('safe')">&#10003; Mark safe</button>
+      <button class="mb" id="mb-flag" onclick="setMode('flag')">&#9873; Flag danger</button>
+    </div>
+
+    <div id="g-leg">
+      <div class="li"><div class="lsw" style="background:#c8922e">&#9670;</div>Flying Geese</div>
+      <div class="li"><div class="lsw" style="background:#2e7040">&#9733;</div>North Star</div>
+      <div class="li"><div class="lsw" style="background:#6644c0">&#9632;</div>Bear&rsquo;s Paw</div>
+      <div class="li"><div class="lsw" style="background:#1868a8">&#8855;</div>Bow Ties</div>
+      <div class="li"><div class="lsw" style="background:#a83020">&#9670;</div>Crossroads</div>
+      <div class="li"><div class="lsw" style="background:#505c68">&#9632;</div>Log Cabin</div>
+      <div class="li"><div class="lsw" style="background:#1a1205;border:1px solid #5a3d12;color:#9a7840">?</div>Unknown path</div>
+    </div>
+  </div>
+
+  <!-- GAME OVER -->
+  <div class="cq-card" id="s-over" style="display:none">
+    <div class="endcard over">
+      <div class="ec-icon">&#9888;</div>
+      <div class="ec-title">Game Over</div>
+      <div class="ec-sub">You triggered 4 patrol alerts. The route has been compromised. The conductors will re-stitch the quilt when it is safe to try again.</div>
+      <div class="ec-detail" id="go-detail"></div>
+      <div class="ec-btns">
+        <button class="cq-btn" onclick="startGame()">Try again</button>
+        <button class="cq-btn secondary" onclick="showStart()">Back to start</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VICTORY -->
+  <div class="cq-card" id="s-win" style="display:none">
+    <div class="endcard win">
+      <div class="ec-icon">&#9733;</div>
+      <div class="ec-title">Freedom Attained</div>
+      <div class="ec-sub" id="win-sub">You decoded the quilt and navigated every safe passage.</div>
+      <div class="ec-score" id="win-score">100</div>
+      <div class="ec-note">points scored</div>
+      <div class="ec-detail" id="win-detail"></div>
+      <div class="ec-btns">
+        <button class="cq-btn" onclick="startGame()">Play again</button>
+        <button class="cq-btn secondary" onclick="showStart()">Back to start</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TOOLTIP — outside shell so it renders above everything -->
+<div id="g-tt">
+  <div class="tn" id="tt-name"></div>
+  <div class="ts">Historical context</div>
+  <div class="tb" id="tt-body"></div>
+  <div class="ta" id="tt-lore"></div>
+</div>
+
+<script>
+const PATS=[
+  {id:'goose',name:'Flying Geese',sym:'goose',col:'#d4962e',safe:true,
+   ctx:'Rows of upward-pointing triangles guided travelers north toward Canada. Conductors stitched this to signal direction of travel — always follow the flock.',
+   lore:'The geese always fly north toward freedom.'},
+  {id:'star',name:'North Star',sym:'star',col:'#2e8040',safe:true,
+   ctx:'The eight-pointed star represented Polaris — fixed in the night sky. Harriet Tubman told freedom seekers to follow it without fail. A reliable beacon of sanctuary.',
+   lore:'Follow the star that never moves.'},
+  {id:'bear',name:"Bear's Paw",sym:'bear',col:'#6644c0',safe:true,
+   ctx:"Bears know mountain passes and water sources. This pattern marked reliable trails through Appalachian terrain. Trust the animal's instinct — it leads to safe ground.",
+   lore:'The bear leaves tracks worth following.'},
+  {id:'bow',name:'Bow Ties',sym:'bow',col:'#1868a8',safe:true,
+   ctx:"Bow Tie quilts hung at a conductor's home signaled a safe house — food, shelter, and the next leg of the journey awaited inside.",
+   lore:'Where the cloth is dressed well, the door is open.'},
+  {id:'cross',name:'Crossroads',sym:'cross',col:'#a83020',safe:false,
+   ctx:'Crossroads were watched by slave catchers. The diamond pattern warned travelers to avoid open intersections and stick to the tree line.',
+   lore:'Where paths cross openly, so do eyes.'},
+  {id:'cabin',name:'Log Cabin',sym:'cabin',col:'#505c68',safe:false,
+   ctx:'A Log Cabin quilt with a dark center warned of an overseer or bounty hunter. The dark hearth means no welcome. Pass quickly.',
+   lore:'When the center is dark, the house is not safe.'},
+];
+const BLANK={id:'blank',name:'Unknown path',sym:'blank',col:null,
+  ctx:'Plain cloth — no pattern stitched here. But conductors also used bare fabric deliberately: sometimes marking a hidden route, sometimes laying a trap.',
+  lore:'Silence can mean safety or snare.'};
+
+const G=4,TOTAL=16,MAX_STRIKES=4,NEED_SAFE=8;
+let board=[],mode='safe',strikes=0,found=0,gone=false,hov=-1;
+let cv,cx2,cs,DPR=window.devicePixelRatio||1;
+
+/* ── SCREEN SWITCHING ─── */
+function showStart(){
+  document.getElementById('s-start').style.display='';
+  document.getElementById('s-game').style.display='none';
+  document.getElementById('s-over').style.display='none';
+  document.getElementById('s-win').style.display='none';
+  hideTT();
+}
+function showGame(){
+  document.getElementById('s-start').style.display='none';
+  document.getElementById('s-game').style.display='flex';
+  document.getElementById('s-over').style.display='none';
+  document.getElementById('s-win').style.display='none';
+}
+function showOver(){
+  document.getElementById('s-start').style.display='none';
+  document.getElementById('s-game').style.display='none';
+  document.getElementById('s-over').style.display='';
+  document.getElementById('s-win').style.display='none';
+}
+function showWin(){
+  document.getElementById('s-start').style.display='none';
+  document.getElementById('s-game').style.display='none';
+  document.getElementById('s-over').style.display='none';
+  document.getElementById('s-win').style.display='';
+}
+
+/* ── GAME INIT ─── */
+function startGame(){
+  strikes=0;found=0;gone=false;hov=-1;
+  setMode('safe');updStrikes();
+  setMsg('Hover any patch to read its historical context. Select a mode below, then click to make your call.','');
+
+  const safePats=PATS.filter(p=>p.safe);
+  const dangPats=PATS.filter(p=>!p.safe);
+  const nNS=4,nND=2,nB=TOTAL-nNS-nND;
+  const nBS=Math.ceil(nB/2),nBD=nB-nBS;
+  let pool=[];
+  const ss=[...safePats].sort(()=>Math.random()-0.5);
+  const sd=[...dangPats].sort(()=>Math.random()-0.5);
+  for(let i=0;i<nNS;i++) pool.push({pat:{...ss[i%ss.length]},isSafe:true,isBlank:false,revealed:false,state:'hidden'});
+  for(let i=0;i<nND;i++) pool.push({pat:{...sd[i%sd.length]},isSafe:false,isBlank:false,revealed:false,state:'hidden'});
+  for(let i=0;i<nBS;i++) pool.push({pat:{...BLANK},isSafe:true,isBlank:true,revealed:false,state:'hidden'});
+  for(let i=0;i<nBD;i++) pool.push({pat:{...BLANK},isSafe:false,isBlank:true,revealed:false,state:'hidden'});
+  pool.sort(()=>Math.random()-0.5);
+  board=pool;
+
+  document.getElementById('p-found').textContent='0';
+  document.getElementById('p-str').innerHTML='0<span style="font-size:10px;font-weight:400">/4</span>';
+  showGame();
+  setTimeout(()=>{sizeCanvas();redraw();},40);
+}
+
+function setMode(m){
+  mode=m;
+  document.getElementById('mb-safe').className='mb'+(m==='safe'?' on':'');
+  document.getElementById('mb-flag').className='mb'+(m==='flag'?' on-flag':'');
+}
+function setMsg(html,type){
+  const el=document.getElementById('g-msg');
+  el.innerHTML=html;el.className=type||'';
+}
+function updStrikes(){
+  for(let i=0;i<4;i++) document.getElementById('sd'+i).classList.toggle('lit',i<strikes);
+  document.getElementById('p-str').innerHTML=`${strikes}<span style="font-size:10px;font-weight:400">/4</span>`;
+}
+function doHint(){
+  const pool=board.filter(c=>c.state==='hidden');
+  if(!pool.length){setMsg('No more hidden patches.','hint');return;}
+  const c=pool[Math.floor(Math.random()*pool.length)];
+  setMsg('<strong>Conductor\'s whisper:</strong> '+c.pat.lore,'hint');
+}
+
+/* ── CANVAS SIZING ─── */
+function sizeCanvas(){
+  const wrap=document.getElementById('g-wrap');
+  const W=wrap.clientWidth||580;
+  cs=Math.floor(W/G);
+  cv.width=cs*G*DPR;cv.height=cs*G*DPR;
+  cv.style.width=cs*G+'px';cv.style.height=cs*G+'px';
+  cx2.setTransform(1,0,0,1,0,0);cx2.scale(DPR,DPR);
+}
+function ciAt(x,y){
+  const col=Math.floor(x/cs),row=Math.floor(y/cs);
+  if(col<0||col>=G||row<0||row>=G) return -1;
+  return row*G+col;
+}
+
+/* ── PATTERN RENDERERS ─── */
+function drawGoose(x,y,col,s){
+  cx2.fillStyle=col;
+  const mcx=x+s/2,mcy=y+s/2;
+  for(let r=0;r<3;r++){
+    const ty=mcy-s*0.19+r*s*0.165;
+    cx2.beginPath();
+    cx2.moveTo(mcx,ty-s*0.092);
+    cx2.lineTo(mcx-s*0.13,ty+s*0.075);
+    cx2.lineTo(mcx+s*0.13,ty+s*0.075);
+    cx2.closePath();cx2.fill();
+  }
+}
+function drawStar(x,y,col,s){
+  const mcx=x+s/2,mcy=y+s/2,ro=s*0.29,ri=s*0.12,pts=8;
+  cx2.fillStyle=col;cx2.beginPath();
+  for(let p=0;p<pts*2;p++){
+    const a=(p*Math.PI/pts)-Math.PI/2,r=p%2===0?ro:ri;
+    p===0?cx2.moveTo(mcx+Math.cos(a)*r,mcy+Math.sin(a)*r):cx2.lineTo(mcx+Math.cos(a)*r,mcy+Math.sin(a)*r);
+  }
+  cx2.closePath();cx2.fill();
+}
+function drawBear(x,y,col,s){
+  const mcx=x+s/2,mcy=y+s/2,bs=s*0.155;
+  cx2.fillStyle=col;
+  [[-0.21,-0.21],[0.21,-0.21],[-0.21,0.21],[0.21,0.21],[0,0]].forEach(([ox,oy])=>{
+    cx2.fillRect(mcx+ox*s-bs/2,mcy+oy*s-bs/2,bs,bs);
+  });
+}
+function drawBow(x,y,col,s){
+  const mcx=x+s/2,mcy=y+s/2;
+  cx2.fillStyle=col;
+  cx2.beginPath();cx2.moveTo(mcx-s*0.26,mcy-s*0.19);cx2.lineTo(mcx,mcy);cx2.lineTo(mcx-s*0.26,mcy+s*0.19);cx2.closePath();cx2.fill();
+  cx2.beginPath();cx2.moveTo(mcx+s*0.26,mcy-s*0.19);cx2.lineTo(mcx,mcy);cx2.lineTo(mcx+s*0.26,mcy+s*0.19);cx2.closePath();cx2.fill();
+  cx2.fillStyle='rgba(255,255,255,0.32)';cx2.beginPath();cx2.arc(mcx,mcy,s*0.055,0,Math.PI*2);cx2.fill();
+}
+function drawCross(x,y,col,s){
+  const mcx=x+s/2,mcy=y+s/2;
+  cx2.fillStyle=col;
+  cx2.beginPath();cx2.moveTo(mcx,mcy-s*0.28);cx2.lineTo(mcx+s*0.17,mcy);cx2.lineTo(mcx,mcy+s*0.28);cx2.lineTo(mcx-s*0.17,mcy);cx2.closePath();cx2.fill();
+  cx2.strokeStyle='rgba(255,255,255,0.22)';cx2.lineWidth=s*0.048;
+  cx2.beginPath();cx2.moveTo(mcx,mcy-s*0.25);cx2.lineTo(mcx,mcy+s*0.25);cx2.stroke();
+  cx2.beginPath();cx2.moveTo(mcx-s*0.145,mcy);cx2.lineTo(mcx+s*0.145,mcy);cx2.stroke();
+}
+function drawCabin(x,y,col,s){
+  const mcx=x+s/2,mcy=y+s/2,sq=s*0.48;
+  cx2.fillStyle=col;cx2.fillRect(mcx-sq/2,mcy-sq/2,sq,sq);
+  cx2.fillStyle='rgba(0,0,0,0.6)';cx2.beginPath();cx2.arc(mcx,mcy,s*0.115,0,Math.PI*2);cx2.fill();
+}
+function drawUnknown(x,y,s,isHov){
+  const mcx=x+s/2,mcy=y+s/2;
+  // subtle weave grid
+  cx2.globalAlpha=isHov?0.45:0.22;
+  cx2.strokeStyle='#8a6828';cx2.lineWidth=0.7;
+  const step=s/5;
+  cx2.beginPath();
+  for(let i=1;i<5;i++){
+    cx2.moveTo(x+i*step,y);cx2.lineTo(x+i*step,y+s);
+    cx2.moveTo(x,y+i*step);cx2.lineTo(x+s,y+i*step);
+  }
+  cx2.stroke();
+  // label
+  cx2.globalAlpha=isHov?0.85:0.5;
+  cx2.fillStyle='#c09040';
+  cx2.font=`500 ${Math.max(9,s*0.155)}px var(--font-sans,sans-serif)`;
+  cx2.textAlign='center';cx2.textBaseline='middle';
+  cx2.fillText('unknown path',mcx,mcy);
+  cx2.globalAlpha=1;
+}
+
+/* ── CELL RENDERER ─── */
+function drawCell(idx){
+  const col=idx%G,row=Math.floor(idx/G);
+  const x=col*cs,y=row*cs,s=cs;
+  const cell=board[idx];
+  const isH=hov===idx;
+
+  cx2.save();cx2.beginPath();cx2.rect(x,y,s,s);cx2.clip();
+
+  // Cell background — distinct tiers
+  let bg='#1c1508'; // default resting
+  if(cell.state==='correct')      bg='#0a1e0c'; // deep green tint
+  else if(cell.state==='flagged') bg='#1e0a08'; // deep red tint
+  else if(cell.state==='wrong')   bg='#2a0806'; // bright danger red
+  else if(isH)                    bg='#2e2010'; // warm amber hover
+
+  cx2.fillStyle=bg;cx2.fillRect(x,y,s,s);
+
+  // Light inner vignette to separate cell from symbol
+  const grad=cx2.createRadialGradient(x+s/2,y+s/2,s*0.1,x+s/2,y+s/2,s*0.72);
+  grad.addColorStop(0,'rgba(255,255,255,0)');
+  grad.addColorStop(1,'rgba(0,0,0,0.28)');
+  cx2.fillStyle=grad;cx2.fillRect(x,y,s,s);
+
+  const pat=cell.pat;
+  const isBlankUnrev=cell.isBlank&&!cell.revealed;
+
+  if(isBlankUnrev){
+    drawUnknown(x,y,s,isH);
+  } else {
+    // Symbols render at full opacity always — legibility first
+    const alpha=(cell.state==='hidden'&&!isH)?0.7:1.0;
+    cx2.globalAlpha=alpha;
+    if(pat.sym==='goose') drawGoose(x,y,pat.col,s);
+    else if(pat.sym==='star') drawStar(x,y,pat.col,s);
+    else if(pat.sym==='bear') drawBear(x,y,pat.col,s);
+    else if(pat.sym==='bow') drawBow(x,y,pat.col,s);
+    else if(pat.sym==='cross') drawCross(x,y,pat.col,s);
+    else if(pat.sym==='cabin') drawCabin(x,y,pat.col,s);
+    cx2.globalAlpha=1;
+  }
+
+  // State overlays
+  if(cell.state==='correct'){
+    // Green glow border
+    cx2.strokeStyle='#40c060';cx2.lineWidth=3;cx2.strokeRect(x+2,y+2,s-4,s-4);
+    // Check badge — high contrast white on dark green pill
+    const bw=s*0.3,bh=s*0.24,bx=x+s-bw-3,by=y+3;
+    cx2.fillStyle='#40c060';
+    cx2.beginPath();cx2.roundRect(bx,by,bw,bh,4);cx2.fill();
+    cx2.fillStyle='#0a1e0c';
+    cx2.font=`bold ${s*0.18}px sans-serif`;cx2.textAlign='center';cx2.textBaseline='middle';
+    cx2.fillText('✓',bx+bw/2,by+bh/2);
+  } else if(cell.state==='flagged'){
+    cx2.strokeStyle='#c03020';cx2.lineWidth=2.5;
+    cx2.setLineDash([5,4]);cx2.strokeRect(x+2,y+2,s-4,s-4);cx2.setLineDash([]);
+    const bw=s*0.3,bh=s*0.24,bx=x+s-bw-3,by=y+3;
+    cx2.fillStyle='#c03020';
+    cx2.beginPath();cx2.roundRect(bx,by,bw,bh,4);cx2.fill();
+    cx2.fillStyle='#fff8f0';
+    cx2.font=`bold ${s*0.17}px sans-serif`;cx2.textAlign='center';cx2.textBaseline='middle';
+    cx2.fillText('⚑',bx+bw/2,by+bh/2);
+  } else if(cell.state==='wrong'){
+    cx2.strokeStyle='#e03020';cx2.lineWidth=3;cx2.strokeRect(x+2,y+2,s-4,s-4);
+    cx2.fillStyle='rgba(200,30,10,0.18)';cx2.fillRect(x,y,s,s);
+    cx2.fillStyle='#ff7060';cx2.font=`bold ${s*0.32}px sans-serif`;
+    cx2.textAlign='center';cx2.textBaseline='middle';cx2.fillText('✕',x+s/2,y+s/2);
+  }
+
+  // Hover ring — bright amber
+  if(isH&&cell.state==='hidden'){
+    cx2.strokeStyle='#fdd75a';cx2.lineWidth=2.5;
+    cx2.strokeRect(x+2,y+2,s-4,s-4);
+  }
+
+  // Grid line between cells
+  cx2.strokeStyle='rgba(255,180,60,0.14)';cx2.lineWidth=0.5;
+  cx2.strokeRect(x,y,s,s);
+  cx2.restore();
+}
+
+function redraw(){for(let i=0;i<TOTAL;i++) drawCell(i);}
+
+/* ── TOOLTIP ─── */
+function showTT(idx,pageX,pageY){
+  const tt=document.getElementById('g-tt');
+  const cell=board[idx];
+  if(!cell||gone){tt.style.opacity='0';return;}
+  const isBlankUnrev=cell.isBlank&&!cell.revealed;
+  const p=isBlankUnrev?BLANK:cell.pat;
+  document.getElementById('tt-name').textContent=isBlankUnrev?'Unknown path':p.name;
+  document.getElementById('tt-body').textContent=p.ctx;
+  document.getElementById('tt-lore').textContent='\u201c'+p.lore+'\u201d';
+
+  tt.style.opacity='0';tt.style.left='0px';tt.style.top='0px';
+  const ttW=230,ttH=tt.offsetHeight||150;
+  const margin=16;
+  let tx=pageX+margin,ty=pageY-ttH/2;
+  if(tx+ttW>window.innerWidth-8) tx=pageX-ttW-margin;
+  if(ty<8) ty=8;
+  if(ty+ttH>window.innerHeight-8) ty=window.innerHeight-ttH-8;
+  tt.style.left=tx+'px';tt.style.top=ty+'px';tt.style.opacity='1';
+}
+function hideTT(){document.getElementById('g-tt').style.opacity='0';}
+
+/* ── END STATES ─── */
+function triggerGameOver(){
+  gone=true;hideTT();
+  const missed=board.filter(c=>c.isSafe&&c.state!=='correct').length;
+  document.getElementById('go-detail').textContent=
+    `${missed} safe passage${missed!==1?'s':''} remained uncovered. The conductors will re-stitch the quilt.`;
+  setTimeout(showOver,700);
+}
+function triggerVictory(){
+  gone=true;hideTT();
+  const score=Math.max(10,100-strikes*12);
+  const perfect=strikes===0;
+  document.getElementById('win-score').textContent=score;
+  document.getElementById('win-sub').textContent=perfect
+    ?'You navigated the full escape route without triggering a single patrol alert. A perfect reading of the cloth.'
+    :`You found all 8 safe passages with ${strikes} patrol alert${strikes!==1?'s':''}. The conductors are proud.`;
+  document.getElementById('win-detail').textContent=perfect
+    ?'\u201cThe stars aligned and the geese flew true.\u201d'
+    :'\u201cFreedom is not given \u2014 it is decoded, one careful step at a time.\u201d';
+  setTimeout(showWin,500);
+}
+
+/* ── CLICK HANDLER ─── */
+function handleClick(idx){
+  if(gone) return;
+  const cell=board[idx];
+  if(cell.state==='correct'||cell.state==='flagged') return;
+
+  if(cell.isBlank&&!cell.revealed){
+    cell.revealed=true;drawCell(idx);
+    setMsg('<strong>Unknown path revealed.</strong> '+cell.pat.ctx+' Now decide — safe or danger?','hint');
+    return;
+  }
+
+  const wantSafe=mode==='safe';
+  const correct=wantSafe===cell.isSafe;
+
+  if(correct){
+    cell.state=wantSafe?'correct':'flagged';found++;
+    document.getElementById('p-found').textContent=found;
+    setMsg('<strong>'+(wantSafe?'Safe passage confirmed.':'Danger zone flagged.')+'</strong> '+cell.pat.ctx,'success');
+    drawCell(idx);
+    if(found>=NEED_SAFE) triggerVictory();
+  } else {
+    cell.state='wrong';strikes++;
+    updStrikes();
+    setMsg('<strong>Patrol Alert!</strong> '+(wantSafe?'That patch is not safe passage.':'That patch is not a danger zone.')+' '+cell.pat.ctx,'alert');
+    drawCell(idx);
+    setTimeout(()=>{if(board[idx]&&board[idx].state==='wrong'){board[idx].state='hidden';drawCell(idx);}},1500);
+    if(strikes>=MAX_STRIKES) triggerGameOver();
+  }
+}
+
+/* ── EVENT LISTENERS ─── */
+cv=document.getElementById('cqc');
+cx2=cv.getContext('2d');
+
+cv.addEventListener('mousemove',e=>{
+  const r=cv.getBoundingClientRect();
+  const sc=cs*G/r.width;
+  const mx=(e.clientX-r.left)*sc,my=(e.clientY-r.top)*sc;
+  const idx=ciAt(mx,my);
+  const prev=hov;hov=idx;
+  if(prev!==idx){if(prev>=0)drawCell(prev);if(idx>=0)drawCell(idx);}
+  if(idx>=0) showTT(idx,e.clientX,e.clientY);
+  else hideTT();
+});
+
+cv.addEventListener('mouseleave',()=>{
+  const p=hov;hov=-1;hideTT();
+  if(p>=0) drawCell(p);
+});
+
+cv.addEventListener('click',e=>{
+  if(gone) return;
+  const r=cv.getBoundingClientRect();
+  const sc=cs*G/r.width;
+  const mx=(e.clientX-r.left)*sc,my=(e.clientY-r.top)*sc;
+  const idx=ciAt(mx,my);
+  if(idx>=0) handleClick(idx);
+});
+
+window.addEventListener('resize',()=>{
+  if(document.getElementById('s-game').style.display==='flex'){sizeCanvas();redraw();}
+});
+</script>
